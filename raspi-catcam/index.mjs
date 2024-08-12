@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js';
 
 export const handler = async (event) => {
     const sqs = new AWS.SQS();
-    const queueUrl = 'https://sqs.us-east-1.amazonaws.com/001820037060/raspi-catcam.fifo';
+    const queueUrl = process.env['AWS_SQS_QUEUE_URL'];
 
     const params = {
         QueueUrl: queueUrl,
