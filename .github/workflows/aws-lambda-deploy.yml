@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main  # 変更を監視するブランチを指定
-    paths-ignore:
-      - 'docs/**'  # docsディレクトリ以下の変更があってもアクションを実行しない
-      - 'README.md'  # README.mdの変更ではアクションを実行しない
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.mjs'
+      - '**.json'
 
 jobs:
   deploy:
