@@ -28,7 +28,7 @@ jobs:
       run: npm install
 
     - name: Zip Lambda function
-      run: zip -r function.zip .
+      run: zip -j function.zip index.mjs
 
     - name: Package Lambda Layer
       run: |
@@ -57,9 +57,16 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: us-east-1  # 必要に応じてリージョンを設定
 
+    - name: Get latest layer version
+      id: layer_version
+      run: |
+        LAYER_VERSION=$(aws lambda list-layer-versions --layer-name ${{ env.LAYER_NAME }} --query 'LayerVersions[0].Version' --output text)
+        echo "LAYER_VERSION=$LAYER_VERSION" >> $GITHUB_ENV
+      
     - name: Update Lambda Function with New Layer Version
       run: aws lambda update-function-configuration --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --layers arn:aws:lambda:region:account-id:layer:${{ env.LAYER_NAME }}:${{ env.LAYER_VERSION }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: us-east-1  # 必要に応じてリージョンを設定
+        LAYER_VERSION: ${{ env.LAYER_VERSION }}
