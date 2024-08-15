@@ -63,6 +63,9 @@ jobs:
         LAYER_VERSION=$(aws lambda list-layer-versions --layer-name ${{ env.LAYER_NAME }} --query 'LayerVersions[0].Version' --output text)
         echo "LAYER_VERSION=$LAYER_VERSION" >> $GITHUB_ENV
       
+    - name: Wait for previous update to complete
+      run: sleep 30
+
     - name: Update Lambda Function with New Layer Version
       run: aws lambda update-function-configuration --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --layers ${{ env.LAYER_ARN }}:${{ env.LAYER_VERSION }}
       env:
