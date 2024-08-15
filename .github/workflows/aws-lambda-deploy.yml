@@ -1,0 +1,61 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main  # 変更を監視するブランチを指定
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      LAMBDA_FUNCTION_NAME: ${{ secrets.LAMBDA_FUNCTION_NAME }}
+      LAYER_NAME: ${{ secrets.LAMBDA_LAYER_NAME }}
+      LAYER_ZIP: layer.zip
+      LAYER_VERSION: latest  # 必要に応じて指定
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Zip Lambda function
+      run: zip -r function.zip .
+
+    - name: Package Lambda Layer
+      run: |
+        mkdir -p layer/nodejs
+        cp -r node_modules layer/nodejs/
+        zip -r ${LAYER_ZIP} layer
+
+    - name: Deploy Lambda Layer
+      uses: aws-actions/aws-cli-action@v1
+      with:
+        args: lambda publish-layer-version --layer-name ${{ env.LAYER_NAME }} --zip-file fileb://${{ env.LAYER_ZIP }} --compatible-runtimes nodejs14.x
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Deploy to AWS Lambda
+      uses: aws-actions/aws-cli-action@v1
+      with:
+        args: lambda update-function-code --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --zip-file fileb://function.zip
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Update Lambda Function with New Layer Version
+      uses: aws-actions/aws-cli-action@v1
+      with:
+        args: lambda update-function-configuration --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --layers arn:aws:lambda:region:account-id:layer:${{ env.LAYER_NAME }}:${{ env.LAYER_VERSION }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
