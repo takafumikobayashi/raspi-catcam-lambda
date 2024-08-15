@@ -9,6 +9,7 @@ on:
       - '**.ts'
       - '**.mjs'
       - '**.json'
+      - '**.yml'
 
 jobs:
   deploy:
@@ -37,8 +38,8 @@ jobs:
 
     - name: Package Lambda Layer
       run: |
-        mkdir -p layer/nodejs
-        cp -r node_modules layer/nodejs/
+        mkdir -p nodejs
+        cp -r node_modules nodejs/
         zip -r ${LAYER_ZIP} layer
 
     - name: Configure AWS credentials  # AWS認証情報を設定
