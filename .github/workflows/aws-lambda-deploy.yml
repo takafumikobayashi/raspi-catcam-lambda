@@ -64,7 +64,7 @@ jobs:
         echo "LAYER_VERSION=$LAYER_VERSION" >> $GITHUB_ENV
       
     - name: Update Lambda Function with New Layer Version
-      run: aws lambda update-function-configuration --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --layers arn:aws:lambda:region:account-id:layer:${{ env.LAYER_ARN }}:${{ env.LAYER_VERSION }}
+      run: aws lambda update-function-configuration --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --layers ${{ env.LAYER_ARN }}:${{ env.LAYER_VERSION }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
