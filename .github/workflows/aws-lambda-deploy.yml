@@ -44,25 +44,22 @@ jobs:
         aws-region: us-east-1
 
     - name: Deploy Lambda Layer
-      uses: aws-actions/aws-cli-action@v1
-      with:
-        args: lambda publish-layer-version --layer-name ${{ env.LAYER_NAME }} --zip-file fileb://${{ env.LAYER_ZIP }} --compatible-runtimes nodejs14.x
+      run: aws lambda publish-layer-version --layer-name ${{ env.LAYER_NAME }} --zip-file fileb://${{ env.LAYER_ZIP }} --compatible-runtimes nodejs14.x
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
+        AWS_DEFAULT_REGION: us-east-1  # 必要に応じてリージョンを設定
+  
     - name: Deploy to AWS Lambda
-      uses: aws-actions/aws-cli-action@v1
-      with:
-        args: lambda update-function-code --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --zip-file fileb://function.zip
+      run: aws lambda update-function-code --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --zip-file fileb://function.zip
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: us-east-1  # 必要に応じてリージョンを設定
 
     - name: Update Lambda Function with New Layer Version
-      uses: aws-actions/aws-cli-action@v1
-      with:
-        args: lambda update-function-configuration --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --layers arn:aws:lambda:region:account-id:layer:${{ env.LAYER_NAME }}:${{ env.LAYER_VERSION }}
+      run: aws lambda update-function-configuration --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --layers arn:aws:lambda:region:account-id:layer:${{ env.LAYER_NAME }}:${{ env.LAYER_VERSION }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: us-east-1  # 必要に応じてリージョンを設定
