@@ -13,7 +13,6 @@ jobs:
       LAMBDA_FUNCTION_NAME: ${{ secrets.LAMBDA_FUNCTION_NAME }}
       LAYER_NAME: ${{ secrets.LAMBDA_LAYER_NAME }}
       LAYER_ZIP: layer.zip
-      LAYER_VERSION: latest  # 必要に応じて指定
 
     steps:
     - name: Checkout code
