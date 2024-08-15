@@ -40,7 +40,7 @@ jobs:
       run: |
         mkdir -p nodejs
         cp -r node_modules nodejs/
-        zip -r ${LAYER_ZIP} layer
+        zip -r ${LAYER_ZIP} nodejs
 
     - name: Configure AWS credentials  # AWS認証情報を設定
       uses: aws-actions/configure-aws-credentials@v1
