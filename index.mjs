@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk';
-import CryptoJS from 'crypto-js';
+import crypto from 'crypto';
 
 export const handler = async (event) => {
     const sqs = new AWS.SQS();
@@ -15,8 +15,9 @@ export const handler = async (event) => {
     try {
         // X-Line-Signatureの検証
         const channelSecret = process.env['SECRET_KEY']; // Channel secret string
-        const hash = CryptoJS.HmacSHA256(event.body, channelSecret);
-        const signature = CryptoJS.enc.Base64.stringify(hash);
+        const hmac = crypto.createHmac('sha256', channelSecret);
+        hmac.update(event.body);
+        const signature = hmac.digest('base64');
 
         if (signature !== event.headers['x-line-signature']){
             return {

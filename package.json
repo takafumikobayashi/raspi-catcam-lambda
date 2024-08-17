@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1642.0",
-    "crypto-js": "^4.2.0"
+    "aws-sdk": "^2.1642.0"
   }
 }
